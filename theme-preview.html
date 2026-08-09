@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>亮色调方向对比 · 山河三维</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: "PingFang SC", "Microsoft YaHei", sans-serif; background: #eceae6; padding: 40px 24px; color: #333; }
+    header { max-width: 1160px; margin: 0 auto 28px; }
+    header h1 { font-size: 24px; letter-spacing: 2px; color: #2b2b2b; }
+    header p { margin-top: 8px; font-size: 13px; color: #777; line-height: 1.7; }
+    .grid { max-width: 1160px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+    .card { border-radius: 14px; overflow: hidden; box-shadow: 0 8px 28px rgba(0,0,0,.12); background: #fff; display: flex; flex-direction: column; }
+    .card .head { padding: 16px 18px 12px; }
+    .card .head h2 { font-size: 17px; letter-spacing: 1px; }
+    .card .head .mood { font-size: 12px; margin-top: 5px; opacity: .75; }
+    /* 场景模拟区 */
+    .scene { position: relative; height: 210px; overflow: hidden; }
+    .sea { position: absolute; left: 0; right: 0; bottom: 0; height: 64px; }
+    .sea .sea-label { position: absolute; right: 14px; bottom: 18px; font-size: 12px; letter-spacing: 4px; font-weight: bold; }
+    .land { position: absolute; bottom: 40px; display: flex; align-items: flex-end; gap: 3px; left: 18px; }
+    .land .blk { width: 46px; border-radius: 3px 3px 0 0; box-shadow: 0 2px 6px rgba(0,0,0,.15); }
+    .land .s1 { height: 96px; } .land .s2 { height: 62px; } .land .s3 { height: 30px; }
+    .neighbor { position: absolute; left: 18px; bottom: 34px; width: 100%; }
+    .nb-blk { position: absolute; right: 16px; bottom: 0; width: 70px; height: 22px; border-radius: 3px; }
+    .country-label { position: absolute; top: 14px; right: 16px; font-size: 11px; letter-spacing: 1px; }
+    .city-dot { position: absolute; width: 9px; height: 9px; border-radius: 50%; }
+    /* UI 样本区 */
+    .ui { padding: 16px 18px 18px; }
+    .panel { border-radius: 10px; padding: 12px 14px; margin-bottom: 10px; }
+    .panel .t { font-size: 13px; font-weight: bold; margin-bottom: 6px; }
+    .panel .r { font-size: 11px; margin: 3px 0; opacity: .8; }
+    .btnrow { display: flex; gap: 8px; }
+    .btn { font-size: 11px; padding: 6px 12px; border-radius: 14px; }
+    .swatches { display: flex; gap: 6px; margin-top: 12px; }
+    .swatches i { flex: 1; height: 26px; border-radius: 5px; }
+    .note { padding: 0 18px 18px; font-size: 11.5px; line-height: 1.7; opacity: .72; }
+
+    /* ===== 方向A 纸张地图风 ===== */
+    .a .head { background: #f6f1e5; color: #4a3f2f; }
+    .a .scene { background: #f6f1e5; }
+    .a .sea { background: #cddfe3; } .a .sea-label { color: #5b7d84; }
+    .a .land .s1 { background: #c07a3b; } .a .land .s2 { background: #e0b054; } .a .land .s3 { background: #8fae6b; }
+    .a .nb-blk { background: #e3dcc9; }
+    .a .country-label { color: #8a7d63; }
+    .a .city-dot { background: #a3541f; }
+    .a .panel { background: #fffdf6; color: #4a3f2f; border: 1px solid #e2d8c2; }
+    .a .btn { background: #b5651d; color: #fff; }
+    .a .btn.ghost { background: transparent; color: #7a6a4f; border: 1px solid #d8ccb2; }
+    /* ===== 方向B 晴空日光风 ===== */
+    .b .head { background: #eaf2fb; color: #1d3557; }
+    .b .scene { background: #eaf2fb; }
+    .b .sea { background: #a8c8e8; } .b .sea-label { color: #2d5f8f; }
+    .b .land .s1 { background: #b3762a; } .b .land .s2 { background: #e6a94e; } .b .land .s3 { background: #6cae6a; }
+    .b .nb-blk { background: #dfe7f2; }
+    .b .country-label { color: #6f87a6; }
+    .b .city-dot { background: #1e6fd9; }
+    .b .panel { background: rgba(255,255,255,.9); color: #1d3557; border: 1px solid #cfdff0; }
+    .b .btn { background: #1e6fd9; color: #fff; }
+    .b .btn.ghost { background: transparent; color: #4a6b93; border: 1px solid #c3d6ec; }
+    /* ===== 方向C 晨雾柔光风 ===== */
+    .c .head { background: #f1efec; color: #3d4451; }
+    .c .scene { background: #f1efec; }
+    .c .sea { background: #c9d2da; } .c .sea-label { color: #6e7f8d; }
+    .c .land .s1 { background: #a08060; } .c .land .s2 { background: #d9b98a; } .c .land .s3 { background: #9db89a; }
+    .c .nb-blk { background: #e6e3de; }
+    .c .country-label { color: #93999f; }
+    .c .city-dot { background: #7a8b99; }
+    .c .panel { background: #fbfaf8; color: #3d4451; border: 1px solid #e0ddd7; }
+    .c .btn { background: #7a8b99; color: #fff; }
+    .c .btn.ghost { background: transparent; color: #7d8590; border: 1px solid #dcd8d1; }
+</style>
+</head>
+<body>
+<header>
+    <h1>🏔️ 山河三维 · 亮色调方向对比</h1>
+    <p>三个方向共享同一套信息结构，仅配色与气质不同。下方色板依次为：天空 / 海洋 / 一级阶梯 / 二级阶梯 / 三级阶梯 / 周边国家。</p>
+</header>
+<div class="grid">
+
+    <div class="card a">
+        <div class="head"><h2>A · 纸张地图风</h2><div class="mood">暖纸底 × 赭石苔绿，复古地形图质感</div></div>
+        <div class="scene">
+            <div class="country-label">蒙古</div>
+            <div class="neighbor"><div class="nb-blk"></div></div>
+            <div class="land"><div class="blk s1"></div><div class="blk s2"></div><div class="blk s3"></div></div>
+            <div class="city-dot" style="left:30%;top:42%"></div>
+            <div class="city-dot" style="left:52%;top:58%"></div>
+            <div class="sea"><span class="sea-label">南 海</span></div>
+        </div>
+        <div class="ui">
+            <div class="panel"><div class="t">四川省</div><div class="r">💰 GDP：6.77 万亿元</div><div class="r">👥 常住人口：8,318 万人</div></div>
+            <div class="btnrow"><span class="btn">🏔️ 地形阶梯</span><span class="btn ghost">🌙 暗色</span></div>
+            <div class="swatches"><i style="background:#f6f1e5"></i><i style="background:#cddfe3"></i><i style="background:#c07a3b"></i><i style="background:#e0b054"></i><i style="background:#8fae6b"></i><i style="background:#e3dcc9"></i></div>
+        </div>
+        <div class="note">参照《国家地理》纸质地形图：暖米纸底、赭石与苔绿梯级、奶白卡片。气质沉静耐看，适合展览、印刷感与文艺场景。</div>
+    </div>
+
+    <div class="card b">
+        <div class="head"><h2>B · 晴空日光风</h2><div class="mood">浅蓝天空 × 鲜亮梯级，现代数据可视化</div></div>
+        <div class="scene">
+            <div class="country-label">蒙古</div>
+            <div class="neighbor"><div class="nb-blk"></div></div>
+            <div class="land"><div class="blk s1"></div><div class="blk s2"></div><div class="blk s3"></div></div>
+            <div class="city-dot" style="left:30%;top:42%"></div>
+            <div class="city-dot" style="left:52%;top:58%"></div>
+            <div class="sea"><span class="sea-label">南 海</span></div>
+        </div>
+        <div class="ui">
+            <div class="panel"><div class="t">四川省</div><div class="r">💰 GDP：6.77 万亿元</div><div class="r">👥 常住人口：8,318 万人</div></div>
+            <div class="btnrow"><span class="btn">🏔️ 地形阶梯</span><span class="btn ghost">🌙 暗色</span></div>
+            <div class="swatches"><i style="background:#eaf2fb"></i><i style="background:#a8c8e8"></i><i style="background:#b3762a"></i><i style="background:#e6a94e"></i><i style="background:#6cae6a"></i><i style="background:#dfe7f2"></i></div>
+        </div>
+        <div class="note">参照现代数据大屏的日间模式（AntV / ECharts 浅色）：白玻卡片、深蓝文字、高饱和梯级。清爽醒目，适合投屏与白天使用。</div>
+    </div>
+
+    <div class="card c">
+        <div class="head"><h2>C · 晨雾柔光风</h2><div class="mood">灰白底 × 莫兰迪低饱和，安静克制</div></div>
+        <div class="scene">
+            <div class="country-label">蒙古</div>
+            <div class="neighbor"><div class="nb-blk"></div></div>
+            <div class="land"><div class="blk s1"></div><div class="blk s2"></div><div class="blk s3"></div></div>
+            <div class="city-dot" style="left:30%;top:42%"></div>
+            <div class="city-dot" style="left:52%;top:58%"></div>
+            <div class="sea"><span class="sea-label">南 海</span></div>
+        </div>
+        <div class="ui">
+            <div class="panel"><div class="t">四川省</div><div class="r">💰 GDP：6.77 万亿元</div><div class="r">👥 常住人口：8,318 万人</div></div>
+            <div class="btnrow"><span class="btn">🏔️ 地形阶梯</span><span class="btn ghost">🌙 暗色</span></div>
+            <div class="swatches"><i style="background:#f1efec"></i><i style="background:#c9d2da"></i><i style="background:#a08060"></i><i style="background:#d9b98a"></i><i style="background:#9db89a"></i><i style="background:#e6e3de"></i></div>
+        </div>
+        <div class="note">参照无印良品式莫兰迪色系：灰白天空、雾蓝海面、低饱和梯级。视觉刺激最低，适合长时间观看与安静氛围。</div>
+    </div>
+
+</div>
+</body>
+</html>

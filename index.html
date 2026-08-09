@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>山河三维 · 中国地形交互可视化</title>
+<link rel="stylesheet" href="assets/index.css">
+</head>
+<body>
+<div id="container"></div>
+
+<div id="title">
+    <h1>🏔️ 山河三维</h1>
+    <p>中国地形三大阶梯 · 省级边界 · 省会与副省级城市</p>
+</div>
+
+<div id="panel">
+    <h3 id="panelToggle">图例说明<span class="panel-toggle">▼ 收起</span></h3>
+    <div id="legendBody">
+    <div class="legend-item"><div class="legend-color" style="background:#b5651d"></div>第一级阶梯（青藏高原，均高&gt;4000m）</div>
+    <div class="legend-item"><div class="legend-color" style="background:#e8a33d"></div>第二级阶梯（高原/盆地，1000~2000m）</div>
+    <div class="legend-item"><div class="legend-color" style="background:#5faf5f"></div>第三级阶梯（平原/丘陵，&lt;500m）</div>
+    </div>
+    <div class="divider"></div>
+    <div class="legend-item"><div class="legend-line" style="border-color:#ff5252"></div>一/二级阶梯分界线</div>
+    <div class="legend-item"><div class="legend-line" style="border-color:#ffd75e"></div>二/三级阶梯分界线</div>
+    <div class="legend-item"><div class="legend-line" style="border-color:#9d6bff"></div>胡焕庸线（黑河—腾冲，人口分界线）</div>
+    <div class="divider"></div>
+    <div class="legend-item"><div class="legend-dot" style="background:#ffd75e"></div>省会 / 直辖市</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#4ac6ff"></div>副省级城市（计划单列市）</div>
+    <div class="divider"></div>
+    <div class="legend-item"><div class="legend-dot lg-mountain"></div>风景名胜 · 名山（⛰ 海拔）</div>
+    <div class="legend-item"><div class="legend-line lg-river"></div>风景名胜 · 大江干流</div>
+    <div class="legend-item"><div class="legend-dot lg-lake"></div>风景名胜 · 主要湖泊</div>
+    <div class="divider"></div>
+    <div style="font-size:11px;color:#8fa8c8;line-height:1.6">
+        🖱️ 拖拽旋转 · 滚轮缩放 · 右键/双指平移<br>悬停省份查看信息 · 点击锁定/再点取消
+    </div>
+</div>
+
+<div id="controls">
+    <button id="btnLabels" class="active">🏷️ 标签</button>
+    <button id="btnBoundaries" class="active">〰️ 阶梯分界线</button>
+    <button id="btnHuan">⚖️ 胡焕庸线</button>
+    <button id="btnFlight">✈️ 飞行航线</button>
+    <button id="btnNeighbors" class="active">🌏 周边国家</button>
+    <button id="btnScenic" class="active">🏞️ 风景名胜</button>
+    <button id="btnRotate" class="active">🔄 自动旋转</button>
+    <button id="btnReset">🎯 重置视角</button>
+    <button id="btnTheme">🌞 亮色调</button>
+</div>
+
+<div id="modeSwitch">
+    <div class="ms-title">着色模式</div>
+    <button id="modeTerrain" class="active">🏔️ 地形阶梯</button>
+    <button id="modeGdp">💰 GDP 总量</button>
+    <button id="modePop">👥 常住人口</button>
+</div>
+
+<div id="detail">
+    <span class="d-close" id="detailClose">✕</span>
+    <h2 id="dName">--</h2>
+    <div class="d-step" id="dStep">--</div>
+    <div class="d-row"><span class="k">💰 GDP（2025年）</span><span class="v" id="dGdp">--</span></div>
+    <div class="d-row"><span class="k">👥 常住人口</span><span class="v" id="dPop">--</span></div>
+    <div class="d-row"><span class="k">🏙️ 省会 / 驻地</span><span class="v" id="dCapital">--</span></div>
+    <div class="d-bar">
+        <div class="bar-label"><span>GDP 全国占比</span><span id="dGdpPct">--</span></div>
+        <div class="bar-track"><div class="bar-fill" id="dGdpBar" style="width:0%"></div></div>
+    </div>
+    <div class="d-bar">
+        <div class="bar-label"><span>人口全国占比</span><span id="dPopPct">--</span></div>
+        <div class="bar-track"><div class="bar-fill" id="dPopBar" style="width:0%"></div></div>
+    </div>
+    <div class="d-cities-title" id="dCitiesTitle">🏙️ 省内经济前三城市</div>
+    <div id="dCities"></div>
+    <div class="d-source">数据来源：各省统计局 2025 年统计公报</div>
+</div>
+
+<div id="tooltip"></div>
+
+<div id="loading">
+    <div class="spinner"></div>
+    <div id="loadingText">正在加载中国地图数据…</div>
+</div>
+
+<script type="importmap">
+{
+    "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    }
+}
+</script>
+
+<!-- 经济数据层：普通脚本，先于模块执行（生产用 .min.js，源文件 gdp.js 保留供维护） -->
+<script src="assets/gdp.min.js"></script>
+<!-- 逻辑层：ES 模块（生产用 .min.js，源文件 index.js 保留供维护） -->
+<script type="module" src="assets/index.min.js"></script>
+</body>
+</html>

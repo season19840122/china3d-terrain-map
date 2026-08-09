@@ -1,0 +1,177 @@
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { overflow: hidden; background: #0b1026; font-family: "Microsoft YaHei", "PingFang SC", sans-serif; }
+    #container { width: 100vw; height: 100vh; }
+
+    /* z-index:1 建立独立堆叠上下文，防止 CSS2D 标签的高内联 z-index 穿透 Tooltip/面板 */
+    #labels { position: absolute; top: 0; left: 0; pointer-events: none; overflow: hidden; z-index: 1; }
+    /* 标签子元素也必须不拦截鼠标，否则拖拽/点选在标签上失效（平移被"挡住"的根因） */
+    #labels * { pointer-events: none; }
+
+    .label-province { color: rgba(255,255,255,.75); font-size: 10px; text-shadow: 0 0 4px #000; white-space: nowrap; }
+    .label-capital { color: #ffe9a8; font-size: 11px; font-weight: bold; text-shadow: 0 0 5px #000; white-space: nowrap; }
+    .label-sub { color: #a8e6ff; font-size: 10px; font-weight: bold; text-shadow: 0 0 5px #000; white-space: nowrap; }
+    .label-sea { color: rgba(96,165,250,.65); font-size: 13px; font-weight: bold; letter-spacing: 3px; text-shadow: 0 0 8px rgba(0,30,80,.9); white-space: nowrap; }
+    .label-country { color: rgba(255,255,255,.55); font-size: 11px; letter-spacing: 1px; text-shadow: 0 0 4px #000; white-space: nowrap; }
+    .label-boundary { font-size: 12px; font-weight: bold; white-space: nowrap; text-shadow: 0 0 5px #000; }
+    .label-boundary.b12 { color: #ff5252; }
+    .label-boundary.b23 { color: #ffd75e; }
+    .label-huan { color: #b48aff; font-size: 12px; font-weight: bold; text-shadow: 0 0 5px #000; white-space: nowrap; }
+    .label-huan-note { color: #d9c6ff; font-size: 11px; line-height: 1.5; text-shadow: 0 0 6px #000; white-space: nowrap; }
+    .label-cap { color: #ff9e6b; font-size: 10px; font-weight: bold; text-shadow: 0 0 5px #000; white-space: nowrap; }
+    .label-topcity { color: #ffc9a3; font-size: 10px; text-shadow: 0 0 5px #000; white-space: nowrap; }
+    body.light .label-boundary { text-shadow: 0 0 4px rgba(255,255,255,.9); }
+    body.light .label-boundary.b12 { color: #d84343; }
+    body.light .label-boundary.b23 { color: #b07d10; }
+    body.light .label-huan { color: #6b3fbf; text-shadow: 0 0 4px rgba(255,255,255,.9); }
+    body.light .label-huan-note { color: #5a35a8; text-shadow: 0 0 4px rgba(255,255,255,.9); }
+    body.light .label-cap { color: #a3541f; text-shadow: 0 0 4px rgba(255,255,255,.9); }
+    body.light .label-topcity { color: #8a4a12; text-shadow: 0 0 4px rgba(255,255,255,.9); }
+    .label-mountain { color: #d8b48a; font-size: 10px; text-shadow: 0 0 5px #000; white-space: nowrap; }
+    .label-river { color: rgba(120,190,255,.85); font-size: 11px; font-weight: bold; letter-spacing: 2px; text-shadow: 0 0 6px rgba(0,20,60,.9); white-space: nowrap; }
+    .label-lake { color: rgba(140,210,255,.9); font-size: 10px; font-weight: bold; text-shadow: 0 0 5px rgba(0,20,60,.9); white-space: nowrap; }
+    body.light .label-mountain { color: #6b4a2a; text-shadow: 0 0 4px rgba(255,255,255,.9); }
+    body.light .label-river { color: #2a6f9e; text-shadow: 0 0 4px rgba(255,255,255,.9); }
+    body.light .label-lake { color: #1f6f96; text-shadow: 0 0 4px rgba(255,255,255,.9); }
+
+    #title {
+        position: absolute; top: 18px; left: 24px; color: #fff; pointer-events: none; z-index: 10;
+    }
+    #title h1 { font-size: 22px; letter-spacing: 2px; text-shadow: 0 2px 10px rgba(0,150,255,.5); }
+    #title p { font-size: 12px; color: #9fb8d8; margin-top: 6px; }
+
+    #panel {
+        position: absolute; top: 18px; right: 20px; width: 270px;
+        background: rgba(10,20,40,.85); border: 1px solid rgba(100,180,255,.35);
+        border-radius: 10px; padding: 16px; color: #fff; z-index: 10;
+        backdrop-filter: blur(6px);
+    }
+    #panel h3 { font-size: 15px; margin-bottom: 10px; color: #ffd75e; display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; }
+    #panel h3 .panel-toggle { color: #8fa8c8; font-size: 12px; }
+    #panel.collapsed > :not(h3) { display: none; }
+    #panel.collapsed h3 { margin-bottom: 0; }
+    #panel.collapsed { width: 150px; }
+    .legend-item { display: flex; align-items: center; margin: 6px 0; font-size: 12px; color: #cde3ff; }
+    .legend-color { width: 16px; height: 16px; border-radius: 3px; margin-right: 8px; flex-shrink: 0; }
+    .legend-line { width: 20px; height: 0; border-top: 3px dashed; margin-right: 8px; flex-shrink: 0; }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; margin-right: 8px; flex-shrink: 0; }
+    .lg-mountain { background: #9c6b3c; }
+    .lg-river { border-top-style: solid; border-color: #3f8fd6; }
+    .lg-lake { background: #3d9be0; }
+    body.light .lg-mountain { background: #6b4a2a; }
+    body.light .lg-river { border-color: #2a6f9e; }
+    body.light .lg-lake { background: #4a90c4; }
+    #panel .divider { border-top: 1px solid rgba(255,255,255,.15); margin: 12px 0; }
+
+    #controls {
+        position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+        display: flex; gap: 10px; z-index: 10; flex-wrap: wrap; justify-content: center; max-width: 92vw;
+    }
+    #controls button {
+        background: rgba(10,25,50,.85); color: #cde3ff; border: 1px solid rgba(100,180,255,.4);
+        padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 13px; transition: all .2s;
+    }
+    #controls button:hover { background: rgba(40,80,140,.9); color: #fff; }
+    #controls button.active { background: #1e6fd9; color: #fff; border-color: #6ab7ff; }
+
+    /* 着色模式切换 */
+    #modeSwitch {
+        position: absolute; bottom: 20px; left: 24px; z-index: 10;
+        display: flex; flex-direction: column; gap: 6px;
+    }
+    #modeSwitch .ms-title { font-size: 11px; color: #8fa8c8; letter-spacing: 1px; }
+    #modeSwitch button {
+        background: rgba(10,25,50,.85); color: #cde3ff; border: 1px solid rgba(100,180,255,.4);
+        padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; text-align: left; transition: all .2s;
+    }
+    #modeSwitch button:hover { background: rgba(40,80,140,.9); color: #fff; }
+    #modeSwitch button.active { background: #1e6fd9; color: #fff; border-color: #6ab7ff; }
+
+    /* 省份详情面板 */
+    #detail {
+        position: absolute; left: 24px; top: 50%; transform: translateY(-50%) translateX(-20px);
+        width: 250px; background: rgba(8,18,40,.92); border: 1px solid rgba(255,215,94,.45);
+        border-radius: 12px; padding: 18px; color: #fff; z-index: 15;
+        opacity: 0; pointer-events: none; transition: all .3s;
+        backdrop-filter: blur(8px);
+    }
+    #detail.show { opacity: 1; pointer-events: auto; transform: translateY(-50%) translateX(0); }
+    #detail h2 { font-size: 20px; color: #ffd75e; margin-bottom: 2px; }
+    #detail .d-step { font-size: 12px; color: #9fb8d8; margin-bottom: 12px; }
+    #detail .d-row { display: flex; justify-content: space-between; font-size: 13px; padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,.08); }
+    #detail .d-row .k { color: #8fa8c8; white-space: nowrap; }
+    #detail .d-row .v { color: #eaf4ff; font-weight: bold; white-space: nowrap; margin-left: 10px; }
+    #detail .d-bar { margin-top: 10px; }
+    #detail .d-bar .bar-label { font-size: 11px; color: #8fa8c8; margin-bottom: 4px; display: flex; justify-content: space-between; }
+    #detail .d-bar .bar-track { height: 6px; background: rgba(255,255,255,.12); border-radius: 3px; overflow: hidden; }
+    #detail .d-bar .bar-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, #4a9eff, #ffd75e); transition: width .5s; }
+    #detail .d-close {
+        position: absolute; top: 8px; right: 12px; color: #8fa8c8; cursor: pointer; font-size: 18px; line-height: 1;
+    }
+    #detail .d-close:hover { color: #fff; }
+    #detail .d-cities-title { font-size: 12px; color: #ffd75e; margin: 12px 0 6px; font-weight: bold; }
+    #detail .d-city { display: flex; justify-content: space-between; align-items: center; font-size: 12px; padding: 5px 8px; margin: 3px 0; background: rgba(255,255,255,.05); border-radius: 6px; }
+    #detail .d-city .c-name { color: #eaf4ff; }
+    #detail .d-city .c-name .rank { color: #4a9eff; font-weight: bold; margin-right: 4px; }
+    #detail .d-city .c-meta { color: #8fa8c8; font-size: 11px; }
+    #detail .d-source, #detail .d-none { margin-top: 10px; font-size: 10px; color: #5f7a9c; }
+
+    /* ===== 亮色主题（纸张地图风）===== */
+    body.light { background: #f6f1e5; }
+    body.light .label-province { color: rgba(74,63,47,.82); text-shadow: 0 0 4px rgba(255,255,255,.85); }
+    body.light .label-capital { color: #8a4a12; text-shadow: 0 0 4px rgba(255,255,255,.9); }
+    body.light .label-sub { color: #1d5fa8; text-shadow: 0 0 4px rgba(255,255,255,.9); }
+    body.light .label-sea { color: rgba(60,110,120,.78); text-shadow: 0 0 6px rgba(255,255,255,.85); }
+    body.light .label-country { color: rgba(110,98,74,.78); text-shadow: 0 0 4px rgba(255,255,255,.85); }
+    body.light #title h1 { color: #3d3223; text-shadow: 0 2px 10px rgba(180,120,40,.25); }
+    body.light #title p { color: #8a7d63; }
+    body.light #panel, body.light #detail, body.light #tooltip {
+        background: rgba(255,253,246,.93); border-color: #ddd1b6; color: #4a3f2f;
+    }
+    body.light #panel h3, body.light #detail h2, body.light #tooltip .tt-name { color: #a3541f; }
+    body.light #panel .legend-item { color: #5c503c; }
+    body.light #panel .divider { border-top-color: rgba(74,63,47,.15); }
+    body.light #panel .d-source, body.light #panel .ms-note { color: #8a7d63; }
+    body.light #detail .d-step { color: #8a7d63; }
+    body.light #detail .d-row .k { color: #8a7d63; }
+    body.light #detail .d-row .v { color: #4a3f2f; }
+    body.light #detail .d-bar .bar-label { color: #8a7d63; }
+    body.light #detail .d-bar .bar-track { background: rgba(74,63,47,.12); }
+    body.light #detail .d-bar .bar-fill { background: linear-gradient(90deg, #b5651d, #e0b054); }
+    body.light #detail .d-close { color: #a09478; }
+    body.light #detail .d-close:hover { color: #4a3f2f; }
+    body.light #detail .d-cities-title { color: #a3541f; }
+    body.light #detail .d-source, body.light #detail .d-none { color: #a09478; }
+    body.light #detail .d-city { background: rgba(74,63,47,.06); }
+    body.light #detail .d-city .c-name { color: #4a3f2f; }
+    body.light #detail .d-city .c-name .rank { color: #b5651d; }
+    body.light #detail .d-city .c-meta { color: #8a7d63; }
+    body.light #detail div[style] { color: #a09478 !important; }
+    body.light #tooltip .tt-row { color: #5c503c; }
+    body.light #controls button, body.light #modeSwitch button {
+        background: rgba(255,253,246,.92); color: #6b5b40; border-color: #d8ccb2;
+    }
+    body.light #controls button:hover, body.light #modeSwitch button:hover { background: #efe6d2; color: #3d3223; }
+    body.light #controls button.active, body.light #modeSwitch button.active { background: #b5651d; color: #fff; border-color: #b5651d; }
+    body.light #modeSwitch .ms-title { color: #8a7d63; }
+    body.light #loading { background: #f6f1e5; color: #8a7d63; }
+    body.light .spinner { border-color: rgba(181,101,29,.2); border-top-color: #b5651d; }
+
+    #tooltip {
+        position: absolute; pointer-events: none; z-index: 20; display: none;
+        background: rgba(5,15,35,.92); border: 1px solid #4a9eff; border-radius: 8px;
+        padding: 10px 14px; color: #fff; font-size: 13px; min-width: 180px;
+    }
+    #tooltip .tt-name { font-size: 15px; font-weight: bold; color: #ffd75e; margin-bottom: 4px; }
+    #tooltip .tt-row { margin: 3px 0; color: #cde3ff; }
+    #tooltip .tt-hint { color: #7d97b8; font-size: 11px; }
+    body.light #tooltip .tt-hint { color: #8a7d63; }
+
+    #loading {
+        position: absolute; inset: 0; background: #0b1026; z-index: 99;
+        display: flex; flex-direction: column; align-items: center; justify-content: center; color: #9fb8d8;
+    }
+    .spinner {
+        width: 44px; height: 44px; border: 4px solid rgba(100,180,255,.2);
+        border-top-color: #4a9eff; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }

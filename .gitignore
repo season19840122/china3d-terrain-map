@@ -1,0 +1,7 @@
+# 源码与源映射仅本地维护，公开仓库只保留混淆压缩版，防剽窃
+assets/index.js
+assets/gdp.js
+assets/*.map
+
+# 系统与中间文件
+.DS_Store
