@@ -16,7 +16,10 @@
       "Bash(git push *)",
       "Bash(python3)",
       "Bash(git commit -m 'fix: 修复湖泊位置 *)",
-      "Bash(git commit *)"
+      "Bash(git commit *)",
+      "WebFetch(domain:en.wikipedia.org)",
+      "WebSearch",
+      "Bash(npx --yes terser assets/index.js -o assets/index.min.js -m --source-map \"content='assets/index.min.js.map',url=assets/index.min.js.map\")"
     ]
   }
 }
