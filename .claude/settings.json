@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -o /Users/Season/FindEndorphin/工作/AI/codex/china3d-terrain-map/assets/china.json \"https://geo.datav.aliyun.com/areas_v3/bound/100000_full.json\")",
+      "Bash(python3 -m json.tool)",
+      "Bash(python3 -c \"import json; data = json.load\\(open\\('/Users/Season/FindEndorphin/工作/AI/codex/china3d-terrain-map/assets/china.json'\\)\\); print\\('Total features:', len\\(data['features']\\)\\); names = [f['properties']['name'] for f in data['features']]; print\\('Provinces:', sorted\\(names\\)\\)\")",
+      "Bash(python3 -c \"import json; data = json.load\\(open\\('/Users/Season/FindEndorphin/工作/AI/codex/china3d-terrain-map/assets/china.json'\\)\\); [print\\(f['properties']['name'], len\\(json.dumps\\(f['geometry']\\)\\)\\) for f in data['features'] if '南海' in f['properties'].get\\('name', ''\\) or '三沙' in f['properties'].get\\('name', ''\\)]\")",
+      "Bash(python3 -c \"import json; data = json.load\\(open\\('/Users/Season/FindEndorphin/工作/AI/codex/china3d-terrain-map/assets/china.json'\\)\\); [print\\(f['properties']['name']\\) for f in data['features'] if '海南' in f['properties'].get\\('name', ''\\)]\")",
+      "Bash(python3 -c \"import json; data = json.load\\(open\\('/Users/Season/FindEndorphin/工作/AI/codex/china3d-terrain-map/assets/china.json'\\)\\); hainan = [f for f in data['features'] if '海南' in f['properties'].get\\('name', ''\\)][0]; print\\('Hainan geometry type:', hainan['geometry']['type']\\); print\\('Number of polygon rings:', len\\(hainan['geometry']['coordinates']\\) if hainan['geometry']['type'] == 'Polygon' else 'MultiPolygon with', len\\(hainan['geometry']['coordinates']\\), 'polygons'\\)\")",
+      "Bash(npm list *)",
+      "Bash(npx terser *)",
+      "Bash(python3 -m http.server 8080 --bind localhost)",
+      "Bash(curl -s http://localhost:8080/)",
+      "Bash(git add *)",
+      "Bash(git commit -m 'fix: 本地化地图数据并优化南海诸岛显示 *)",
+      "Bash(git push *)"
+    ]
+  }
+}
