@@ -13,7 +13,10 @@
       "Bash(curl -s http://localhost:8080/)",
       "Bash(git add *)",
       "Bash(git commit -m 'fix: 本地化地图数据并优化南海诸岛显示 *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(python3)",
+      "Bash(git commit -m 'fix: 修复湖泊位置 *)",
+      "Bash(git commit *)"
     ]
   }
 }
